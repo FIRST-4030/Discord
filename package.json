@@ -1,0 +1,16 @@
+{
+  "name": "todo-bot",
+  "version": "0.0.1",
+  "description": "Bot to manage the #todo channel in the team's discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "author": "Timothy Puls",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "discord.js-commando": "^0.10.0",
+    "eslint": "^5.9.0"
+  }
+}
