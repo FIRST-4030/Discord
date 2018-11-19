@@ -1,5 +1,6 @@
 const Commando = require('discord.js-commando');
-const settings = require('settings.json');
+const TaskUtils = require('../../taskUtils');
+const settings = require('../../settings.json');
 
 module.exports = class AddCommand extends Commando.Command {
     constructor(client) {
@@ -9,20 +10,54 @@ module.exports = class AddCommand extends Commando.Command {
             group: 'todo',
             memberName: 'add',
             description: 'Add a task to the ToDo channel',
-            format: '~add -t title -d description',
             examples: ['~add -t important thing -d important thing that needs to be done'],
             guildOnly: true,
             args: [
                 {
-                    key: 'stuff',
+                    key: 'task',
                     prompt: 'you shouldn\'t see this',
-                    infinite: true,
-                    validate: function(val, msg, arg) {
-
+                    type: 'string',
+                    // This makes an annoyingly long response but it's neccesary sooo
+                    validate(val, msg, arg) {
+                        console.log(val);
+                        return /^-t .+? -d .+?$/.test(val);
+                    },
+                    // Seperates the input into title and desc
+                    parse(val, msg, arg) {
+                        let parts = [];
+                        parts[0] = val.substring(val.search('-t') + 3, val.search(' -d'));
+                        parts[1] = val.substring(val.search('-d') + 3, val.length);
+                        return parts;
                     }
                 }
             ],
             argsPromptLimit: 0
         })
+    }
+
+    async run(message, { task }) {
+        let exists = false;
+        
+        // Get ToDo channel
+        const todo = message.guild.channels.get(settings.todo_channel);
+
+        // Get Tasks
+        todo.fetchMessages()
+            .then(tasks => {
+                // Check each task for the same title
+                tasks.array().forEach(t => {
+                    if (t.content.startsWith(`**${task[0]}**`)) {
+                        message.reply('A task with that title already exists');
+                        exists = true;
+                    }
+                });
+
+                
+            }).then(() => {
+                // If there are no tasks with that title, send the task
+                if (!exists)
+                    TaskUtils.addTask(todo, task, message);
+            })
+            .catch(TaskUtils.taskError);
     }
 }

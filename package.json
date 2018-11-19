@@ -11,5 +11,9 @@
   "dependencies": {
     "discord.js": "^11.4.2",
     "discord.js-commando": "^0.10.0"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/FIRST-4030/ToDo-Bot.git"
   }
 }
