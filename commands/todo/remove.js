@@ -1,5 +1,5 @@
 const Commando = require('discord.js-commando');
-const TaskUtils = require('../../taskUtils');
+const TaskUtils = require('../../TaskUtils');
 const settings = require('../../settings.json');
 
 module.exports = class RemoveCommand extends Commando.Command {
@@ -17,7 +17,11 @@ module.exports = class RemoveCommand extends Commando.Command {
                     key: 'title',
                     prompt: 'you shouldn\'t see this',
                     type: 'string',
-                    parse(val, msg, arg) {
+                    // this is incredibly lazy
+                    validate(val) {
+                        return val.startsWith('-t ');
+                    },
+                    parse(val) {
                         return val.substring(3, val.length);
                     }
                 }
@@ -48,6 +52,9 @@ module.exports = class RemoveCommand extends Commando.Command {
                 if (!exists)
                     message.reply('No task with that title exists');
             })
-            .catch(TaskUtils.taskError);
+            .catch(e => {
+                console.error(e);
+                message.react('‼');
+            });
     }
 }

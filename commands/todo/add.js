@@ -1,5 +1,5 @@
 const Commando = require('discord.js-commando');
-const TaskUtils = require('../../taskUtils');
+const TaskUtils = require('../../TaskUtils');
 const settings = require('../../settings.json');
 
 module.exports = class AddCommand extends Commando.Command {
@@ -18,12 +18,12 @@ module.exports = class AddCommand extends Commando.Command {
                     prompt: 'you shouldn\'t see this',
                     type: 'string',
                     // This makes an annoyingly long response but it's neccesary sooo
-                    validate(val, msg, arg) {
+                    validate(val) {
                         console.log(val);
                         return /^-t .+? -d .+?$/.test(val);
                     },
                     // Seperates the input into title and desc
-                    parse(val, msg, arg) {
+                    parse(val) {
                         let parts = [];
                         parts[0] = val.substring(val.search('-t') + 3, val.search(' -d'));
                         parts[1] = val.substring(val.search('-d') + 3, val.length);
@@ -58,6 +58,9 @@ module.exports = class AddCommand extends Commando.Command {
                 if (!exists)
                     TaskUtils.addTask(todo, task, message);
             })
-            .catch(TaskUtils.taskError);
+            .catch(e => {
+                console.error(e);
+                message.react('‼');
+            });
     }
 }
